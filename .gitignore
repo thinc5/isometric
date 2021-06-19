@@ -3,3 +3,7 @@ iso
 *.o
 *.dll
 obj
+
+# Generated at build time, no point committing 
+font.h
+tiles.h
