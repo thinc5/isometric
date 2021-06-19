@@ -22,8 +22,8 @@
 #include "animation.h"
 
 // ACTORS & ACCENTS
-#include "tile.h"
-#include "accent.h"
+#include "./tiles/tile.h"
+#include "./accents/accent.h"
 #include "./actors/actor.h"
 
 // EVENT HANDLING

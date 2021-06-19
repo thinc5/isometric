@@ -1,0 +1,28 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// DISPLAY SETTINGS
+#define WINDOW_TITLE "ISOMETRIC GRID"
+#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1270
+
+#define MAX_FPS (1000 / 144)
+#define VOLUME_DEFAULT (MIX_MAX_VOLUME / 8)
+
+// SPRITE SHEET DETAILS
+#define TILE_WIDTH 64
+#define TILE_HEIGHT 32
+
+#define UTIL_ROW 0
+#define TILE_ROW 1
+#define ACTOR_ROW 5
+
+// GAMEPLAY CONSTANTS
+#define ZOOM_STEP 0.5f
+#define ZOOM_MAX 4.00f
+#define ZOOM_MIN 1.0f
+
+// QUEUE
+#define JOB_QUEUE_SIZE 10
+
+#endif

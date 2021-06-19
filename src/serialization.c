@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include "data.h"
-#include "accent.h"
+#include "./accents/accent.h"
 #include "./actors/actor.h"
 
 #include "serialization.h"

@@ -7,8 +7,8 @@
 #include "config.h"
 
 #include "animation.h"
-#include "tile.h"
-#include "accent.h"
+#include "./tiles/tile.h"
+#include "./accents/accent.h"
 #include "./actors/actor.h"
 
 #include "data.h"
