@@ -2,7 +2,7 @@
 
 ## Compilation
 
-`gcc --std=c99 -Wall -pedantic -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image data.c actor.c animation.c accent.c iso.c ui.c  timer.c rendering.c serialization.c queue.c tile.c -g -o iso`
+`make`
 
 ## Todo
 
