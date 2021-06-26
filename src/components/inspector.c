@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <SDL2/SDL.h>
 
@@ -7,8 +8,37 @@
 #include "../ui.h"
 #include "../rendering.h"
 #include "../serialization.h"
+#include "../components/world.h"
 
 #include "../config.h"
+
+#define LINE_WIDTH 40
+#define ROW_HEIGHT 30
+
+static void draw_info_row(SDL_Renderer *renderer, TTF_Font *font, char* display_string, size_t render_row)
+{
+    draw_font(renderer, font, 0, render_row * ROW_HEIGHT, display_string);
+    memset(display_string, '0', LINE_WIDTH);
+}
+
+static void write_current_time(char *display_string, float time) {
+    snprintf(display_string, 22, "Time Elapsed: %7.3f", time);
+}
+
+static void write_tile_type(char *display_string, TILE_TYPE type)
+{
+    snprintf(display_string, 17, "Tile Type:  %02d", type);
+}
+
+static void write_accent_type(char *display_string, ACCENT_TYPE type)
+{
+    snprintf(display_string, 16, "Accent Type: %02d", type);
+}
+
+static void write_actor_type(char *display_string, ACTOR_TYPE type)
+{
+    snprintf(display_string, 15, "Actor Type: %02d", type);
+}
 
 static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
 {
@@ -20,25 +50,49 @@ static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
         .w = state->w,
         .h = state->h,
     };
-    SDL_SetRenderDrawColor(data->renderer, 125, 125, 125, 125);
-    SDL_RenderFillRect(data->renderer, &logical);
-    // uint32_t time = get_time(&data->timer);
+    SDL_SetRenderDrawColor(renderer, 125, 125, 125, 125);
+    SDL_RenderFillRect(renderer, &logical);
+    size_t draw_row = 0;
+    char line_buffer[LINE_WIDTH] = { 0 };
+
+    // Game time elapsed
+    write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Hovered tile
+    write_tile_type(line_buffer, (int) data->world.board[get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y)]);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Hovered accent
+    write_accent_type(line_buffer, (int) data->world.accents[get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y)].type);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Hovered actor
+    write_actor_type(line_buffer, (int) data->world.actors[get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y)].type);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
 
     // Selected tile
-    TILE_TYPE tile = data->world.board[(data->world.cursor_y * data->world.height) + data->world.cursor_x];
-    char tile_type[] = "Tile Type:   ";
-    snprintf(tile_type + 11, 2, "%u", tile);
-    draw_font(data->renderer, data->font, 0, 0, tile_type);
+    write_tile_type(line_buffer, (int) data->world.board[get_tile_index(data->world.width, data->world.stored_point.x, data->world.stored_point.y)]);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
     // Selected accent
-    Accent *accent = &data->world.accents[(data->world.cursor_y * data->world.height) + data->world.cursor_x];
-    char accent_type[] = "Accent Type:   ";
-    snprintf(accent_type + 12, 2, "%u", accent->type);
-    draw_font(data->renderer, data->font, 0, 30, accent_type);
-    // Selected actor.
-    Actor *actor = &data->world.actors[(data->world.cursor_y * data->world.height) + data->world.cursor_x];
-    char actor_type[] = "Accent Type:   ";
-    snprintf(actor_type + 12, 2, "%u", actor->type);
-    draw_font(data->renderer, data->font, 0, 60, actor_type);
+    write_accent_type(line_buffer, (int) data->world.accents[get_tile_index(data->world.width, data->world.stored_point.x, data->world.stored_point.y)].type);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Selected actor
+    write_actor_type(line_buffer, (int) data->world.actors[get_tile_index(data->world.width, data->world.stored_point.x, data->world.stored_point.y)].type);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // On click status.
+    char on_click_addr[] = "On click:                            ";
+    if (data->world.click_handler == NULL) {
+        snprintf(on_click_addr + 10, 5, "none");
+    } else {
+        snprintf(on_click_addr + 10, 7, "%p", (void*) &data->world.click_handler);
+    }
+    draw_font(data->renderer, data->font, 0, draw_row++ * ROW_HEIGHT, on_click_addr);
+
+    // Reset the render draw colour.
     SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
 }
 
