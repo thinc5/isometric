@@ -44,7 +44,7 @@ void init_data(Data *data)
         (SDL_Point){0, 0}, 4, data, 1920, 1080, NULL
     );
     data->user_interface[1] = create_ui_element[INSPECTOR](
-        (SDL_Point){0, 0}, 4, data, 135, 240, NULL
+        (SDL_Point){0, 0}, 4, data, 140, 300, NULL
     );
     data->user_interface[2] = create_ui_element[BUTTON](
         (SDL_Point){720, 720}, 4, 100, 75, (SDL_Colour){255, 0, 255, 255},

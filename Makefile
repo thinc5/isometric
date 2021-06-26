@@ -17,17 +17,18 @@ OBJDIR	:= obj
 BINDIR	:= .
 
 
-#-------------- Helper scripts
+#-------------- helper scripts
 rm		:= rm -rf
 mkdir	:= mkdir -p
 findc	:= du -a $(SRCDIR) | grep -E '\.(c)$$' | awk '{print $$2}'
 findh	:= du -a $(INCDIR) | grep -E '\.(h)$$' | awk '{print $$2}'
 
-#-------------- Populate build sources
-SOURCES  := $(shell $(findc))
-INCLUDES := $(shell $(findh))
+#-------------- populate build sources
+SOURCES  	:= $(shell $(findc))
+INCLUDES 	:= $(shell $(findh))
+RESOURCES	:= ./$(SRCDIR)/tiles.h ./$(SRCDIR)/font.h
 
-# What are my objects?
+# what are my objects?
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 # make subfolders if they do not already exist.
@@ -35,7 +36,7 @@ XTRADIR  := $(shell ls -d $(INCDIR)/*/** | sed 's/$(INCDIR)/$(OBJDIR)/g')
 $(shell $(mkdir) $(OBJDIR) $(XTRADIR))
 
 
-#-------------- Rules
+#-------------- rules
 # default rules
 all: build
 
@@ -44,8 +45,13 @@ debug: CFLAGS += -DDEBUG -g
 debug: LFLAGS += -DDEBUG -g
 debug: build
 
+# prepare respources
+$(RESOURCES) : ./res/iso_demo.png ./res/ssp-regular.otf
+	@xxd -i ./res/iso_demo.png > ./$(SRCDIR)/tiles.h
+	@xxd -i ./res/ssp-regular.otf > ./$(SRCDIR)/font.h
+
 # compile and link
-build: $(OBJECTS) $(BINDIR)/$(TARGET)
+build: $(RESOURCES) $(OBJECTS) $(BINDIR)/$(TARGET)
 
 # rebuild.
 rebuild: clean
@@ -67,6 +73,7 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 
 # clean all building materials.
 clean:
+	$(rm) $(RESOURCES)
 	@$(rm) $(OBJDIR)
 	@echo "Cleanup complete!"
 	@$(rm) $(BINDIR)/$(TARGET)

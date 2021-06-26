@@ -104,11 +104,11 @@ static void init_rendering(Data *data)
     SDL_RenderSetLogicalSize(data->renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_SetRenderDrawBlendMode(data->renderer, SDL_BLENDMODE_BLEND);
     data->font =
-        TTF_OpenFontRW(SDL_RWFromConstMem(ssp_regular_otf, ssp_regular_otf_len),
+        TTF_OpenFontRW(SDL_RWFromConstMem(__res_ssp_regular_otf, __res_ssp_regular_otf_len),
                        1, WINDOW_WIDTH / 80);
     data->surface =
         IMG_Load_RW(
-            SDL_RWFromConstMem(iso_demo_png, iso_demo_png_len),
+            SDL_RWFromConstMem(__res_iso_demo_png, __res_iso_demo_png_len),
             1);
     data->tiles = SDL_CreateTextureFromSurface(data->renderer, data->surface);
     SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);

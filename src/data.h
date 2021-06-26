@@ -9,12 +9,13 @@
 
 #include "timer.h"
 #include "animation.h"
-#include "./tiles/tile.h"
-#include "./accents/accent.h"
-#include "./actors/actor.h"
 #include "job.h"
 #include "queue.h"
 #include "ui.h"
+
+#include "./tiles/tile.h"
+#include "./accents/accent.h"
+#include "./actors/actor.h"
 
 typedef enum GAME_STATUS
 {
