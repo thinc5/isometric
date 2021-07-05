@@ -1,3 +1,8 @@
+#include <stdbool.h>
+
+#include "../jobs/move_actor.h"
+
+#include "actor.h"
 #include "minion.h"
 
 Actor create_minion(ActorPosition position, int args)
@@ -6,6 +11,6 @@ Actor create_minion(ActorPosition position, int args)
     minion.type = MINION;
     minion.animation = ANIM_MINION_IDLE;
     minion.position = position;
-    minion.on_click = (bool (*)(void *, ...)) & move_actor;
+    minion.on_click = (bool (*)(void *, ...)) & move_actor_job;
     return minion;
 }

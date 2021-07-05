@@ -168,8 +168,9 @@ bool deserialize_map(World *world, const char *filename)
             continue;
         case ',':
             val = strtol(buff, NULL, 0);
-            if (val > NO_ACTOR && val < NUM_ACTORS)
+            if (val > NO_ACTOR && val < NUM_ACTORS) {
                 world->actors[i] = create_actor[val]((ActorPosition) { .x = i % width, .y = i % height }, 0);
+            }
             memset(buff, '\0', pos);
             val = 0;
             pos = 0;

@@ -50,7 +50,6 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         int x = i % world->width;
         int y = i / world->width;
         SDL_Rect loc = iso_to_screen(camera, x, y);
-        SDL_Rect object_loc = { .x = loc.x, .y = loc.y - get_tile_height(camera), .w = loc.w, .h = loc.h };
 
         // Get the possible things to render.
         TILE_TYPE tile = world->board[i];
@@ -66,15 +65,18 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         }
 
         if (accent->type != NO_ACCENT && accent->animation != NO_ANIMATION) {
+            SDL_Rect accent_loc = { .x = loc.x, .y = loc.y - get_tile_height(camera), .w = loc.w, .h = loc.h };
             Animation *animation = &data->animations[accent->animation];
             int step = (time % (animation->step * animation->frames)) / animation->step;
-            SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &object_loc);
+            SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &accent_loc);
         }
 
         if (actor->type != NO_ACTOR && actor->animation != NO_ANIMATION) {
             Animation *animation = &data->animations[actor->animation];
             int step = (time % (animation->step * animation->frames)) / animation->step;
-            SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &object_loc);
+            SDL_Rect actor_loc = iso_fto_screen(camera, actor->position.x, actor->position.y);
+            SDL_Rect actor_pos = { .x = actor_loc.x, .y = actor_loc.y  - get_tile_height(camera), .w = actor_loc.w, .h = actor_loc.h };
+            SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &actor_pos);
         }
     }
 
