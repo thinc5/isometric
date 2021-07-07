@@ -45,7 +45,7 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         int x = i % world->width;
         int y = i / world->width;
         SDL_Rect loc = iso_to_screen(camera, x, y);
-        // Cull 
+        // Cull
         if (loc.x + loc.w < 0 || loc.x > WINDOW_WIDTH || loc.y + loc.h < 0 ||
                 loc.y > WINDOW_HEIGHT)
             continue;
@@ -78,7 +78,7 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         }
 
         // DEBUG INFO
-        const char index_str[3] = "00";
+        char index_str[3] = "00";
         snprintf(index_str, 3, "%02d", i % 100);
         draw_font(renderer, data->font, loc.x + get_tile_height(camera), loc.y, index_str);
     }
@@ -172,42 +172,38 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
         // Camera
         case SDL_SCANCODE_A:
             //if (data->camera_x - 1 >= -(data->width * 0.15))
-            data->camera.x--
+            data->camera.x--;
+            data->camera.y++;
             break;
         case SDL_SCANCODE_D:
             //if (data->camera_x + 1 < (data->width * 0.55))
             data->camera.x++;
+            data->camera.y--;
             break;
         case SDL_SCANCODE_W:
             //if (data->camera_y - 1 >= -(data->height * 0.15))
+            data->camera.x--;
             data->camera.y--;
             break;
         case SDL_SCANCODE_S:
             //if (data->camera_y + 1 < (data->height * 0.55))
             data->camera.y++;
+            data->camera.x++;
             break;
         // Cursor
         case SDL_SCANCODE_LEFT:
             if (data->world.cursor_x - 1 >= 0)
                 data->world.cursor_x--;
-            if (data->world.cursor_y + 1 < data->world.height)
-                data->world.cursor_y++;
             break;
         case SDL_SCANCODE_RIGHT:
             if (data->world.cursor_x + 1 < data->world.width)
                 data->world.cursor_x++;
-            if (data->world.cursor_y - 1 >= 0)
-                data->world.cursor_y--;
             break;
         case SDL_SCANCODE_UP:
-            if (data->world.cursor_x - 1 > -1)
-                data->world.cursor_x--;
             if (data->world.cursor_y - 1 > -1)
                 data->world.cursor_y--;
             break;
         case SDL_SCANCODE_DOWN:
-            if (data->world.cursor_x + 1 < data->world.width)
-                data->world.cursor_x++;
             if (data->world.cursor_y + 1 < data->world.height)
                 data->world.cursor_y++;
             break;
