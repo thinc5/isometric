@@ -17,7 +17,7 @@
 
 static void draw_info_row(SDL_Renderer *renderer, TTF_Font *font, char* display_string, size_t render_row)
 {
-    draw_font(renderer, font, 0, render_row * ROW_HEIGHT, display_string);
+    draw_font(renderer, font, 0, render_row * ROW_HEIGHT, display_string, SDL_COLOUR(DEBUG_FONT_COLOUR));
     memset(display_string, '0', LINE_WIDTH);
 }
 
@@ -90,10 +90,10 @@ static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
     } else {
         snprintf(on_click_addr + 10, 7, "%p", (void*) &data->world.click_handler);
     }
-    draw_font(data->renderer, data->font, 0, draw_row++ * ROW_HEIGHT, on_click_addr);
+    draw_font(data->renderer, data->font, 0, draw_row++ * ROW_HEIGHT, on_click_addr, SDL_COLOUR(DEBUG_FONT_COLOUR));
 
     // Reset the render draw colour.
-    SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(data->renderer, DEFAULT_BACKGROUND_COLOUR);
 }
 
 UI_Element create_inspector(SDL_Point position, int argc, Data* data, unsigned int width,

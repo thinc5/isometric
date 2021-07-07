@@ -79,9 +79,8 @@ SDL_Point iso_from_screen_point(Camera *camera, SDL_Surface *surface,
 }
 
 void draw_font(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
-                      const char *str)
+                      const char *str, SDL_Color c)
 {
-    static SDL_Color c = {0, 0, 255, 255};
     SDL_Surface *surface = TTF_RenderText_Solid(font, str, c);
     SDL_Rect pos = {
         .x = x,
@@ -89,7 +88,7 @@ void draw_font(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
         .w = surface->w,
         .h = surface->h,
     };
-    SDL_RenderFillRect(renderer, &pos);
+    // SDL_RenderFillRect(renderer, &pos);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
     SDL_RenderCopy(renderer, texture, NULL, &pos);

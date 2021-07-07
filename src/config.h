@@ -25,4 +25,11 @@
 // QUEUE
 #define JOB_QUEUE_SIZE 10
 
+// Macro to wrap colour definitions as an SDL_Colour struct initializer.
+#define SDL_COLOUR(COLOUR) (SDL_Color) { COLOUR }
+
+// Static colour definitions
+#define DEFAULT_BACKGROUND_COLOUR 255, 255, 255, 255
+#define DEBUG_FONT_COLOUR 125, 0, 255, 255
+
 #endif

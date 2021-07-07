@@ -26,17 +26,17 @@
 #include "./accents/accent.h"
 #include "./actors/actor.h"
 
-// EVENT HANDLING
+// ROOT EVENT HANDLING
 static void handle_events(Data *data)
 {
     static SDL_Event event;
-    static bool muted;
     while (SDL_PollEvent(&event))
     {
         // Check top level input first
         if (event.type == SDL_QUIT)
         {
             data->status = CLOSING;
+            printf("Closing....\n");
             return;
         }
         // Check ui elements next
@@ -53,37 +53,19 @@ static void handle_events(Data *data)
         switch (event.type)
         {
         case SDL_KEYDOWN:
-            if (event.key.keysym.scancode == SDL_SCANCODE_M)
+            switch (event.key.keysym.scancode)
             {
-                if (muted)
-                {
-                    Mix_VolumeMusic(VOLUME_DEFAULT);
-                    Mix_Volume(-1, VOLUME_DEFAULT * 1.5);
+            case SDL_SCANCODE_F10:
+                if (data->fullscreen) {
+                    SDL_SetWindowFullscreen(data->window, 0);
+                } else {
+                    SDL_SetWindowFullscreen(data->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                 }
-                else
-                {
-                    Mix_VolumeMusic(0);
-                    Mix_Volume(-1, 0);
-                }
-                muted = !muted;
-            }
-            if (data->status == PAUSED)
-            {
-                switch (event.key.keysym.scancode)
-                {
-                case SDL_SCANCODE_P:
-                case SDL_SCANCODE_ESCAPE:
-                    unpause_game(&data->timer);
-                    break;
-                default:
-                    break;
-                }
+                data->fullscreen = !data->fullscreen;
+                break;
+            default:
                 break;
             }
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            break;
-        case SDL_MOUSEMOTION:
             break;
         default:
             break;
@@ -111,7 +93,7 @@ static void init_rendering(Data *data)
             SDL_RWFromConstMem(__res_iso_demo_png, __res_iso_demo_png_len),
             1);
     data->tiles = SDL_CreateTextureFromSurface(data->renderer, data->surface);
-    SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(data->renderer, DEFAULT_BACKGROUND_COLOUR);
 }
 
 static void free_rendering(Data *data)

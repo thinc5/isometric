@@ -20,6 +20,7 @@ void init_data(Data *data)
     data->job_queue = create_queue(JOB_QUEUE_SIZE, QUEUEABLE_JOB);
     // Initialize the game Data.
     data->debug = false;
+    data->fullscreen = false;
     data->current_job.data = NULL;
     data->current_job.process = NULL;
     data->current_job.render = NULL;
@@ -37,7 +38,6 @@ void init_data(Data *data)
     data->timer.pause_time = 0;
     data->timer.pause_start = 0;
     data->last_frame = now;
-    // Mix_PlayMusic(data->theme, -1);
 
     // Create the corresponding world ui component.
     data->user_interface[0] = create_ui_element[WORLD](

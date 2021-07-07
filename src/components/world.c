@@ -77,10 +77,11 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
             SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &actor_pos);
         }
 
-        // DEBUG INFO
-        char index_str[3] = "00";
-        snprintf(index_str, 3, "%02d", i % 100);
-        draw_font(renderer, data->font, loc.x + get_tile_height(camera), loc.y, index_str);
+        if (data->debug) {
+            char index_str[3] = "00";
+            snprintf(index_str, 3, "%02d", i % 100);
+            draw_font(renderer, data->font, loc.x + get_tile_height(camera), loc.y, index_str, SDL_COLOUR(DEBUG_FONT_COLOUR));
+        }
     }
 
     // Draw cursor
@@ -167,7 +168,11 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
             break;
         // Pause
         case SDL_SCANCODE_P:
-            pause_game(&data->timer);
+            if (data->timer.paused) {
+                unpause_game(&data->timer);
+            } else {
+                pause_game(&data->timer);
+            }
             break;
         // Camera
         case SDL_SCANCODE_A:
