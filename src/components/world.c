@@ -16,6 +16,13 @@ int get_tile_index(int width, int x, int y) {
 
 /**
  * Render the world.
+ *
+ * Rendering works like this (3x3);
+ *       00
+ *    03    01
+ * 06    04    02
+ *    07    05
+ *       08
  */
 static void render_world(SDL_Renderer *renderer, UI_Element *element)
 {
@@ -32,30 +39,21 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
     SDL_RenderSetViewport(data->renderer, &logical);
     uint32_t time = get_time(&data->timer);
 
-    // Get the x and y cull range.
-    // int x_quart = (logical.w / get_tile_width(Data)) / 2;
-    // int y_quart = (logical.h / get_tile_height(Data)) / 2;
-    // int x_min = data->camera_x + data->camera_y - x_quart;
-    // x_min = x_min > 0 ? x_min : 0;
-    // int y_min = data->camera_x - data->camera_y - y_quart;
-    // y_min = y_min > 0 ? y_min : 0;
-    // int x_max = x_min + (logical.w / get_tile_width(Data)) + x_quart;
-    // int y_max = y_min + (logical.h / get_tile_height(Data)) + y_quart;
-    // x_max = x_max < data->width ? x_max : data->width;
-    // y_max = y_max < data->height ? y_max : data->height;
-
     // Draw the tiles, accents, actors and cursor.
     for (int i = 0; i < world->width * world->width; i++)
     {
         int x = i % world->width;
         int y = i / world->width;
         SDL_Rect loc = iso_to_screen(camera, x, y);
+        // Cull 
+        if (loc.x + loc.w < 0 || loc.x > WINDOW_WIDTH || loc.y + loc.h < 0 ||
+                loc.y > WINDOW_HEIGHT)
+            continue;
 
         // Get the possible things to render.
         TILE_TYPE tile = world->board[i];
         Accent *accent = &world->accents[i];
         Actor *actor = &world->actors[i];
-
         if (tile != NO_TILE && tiles[tile].animation != NO_ANIMATION) {
             Animation *animation = &data->animations[tiles[tile].animation];
             int step = animation->frames == 1
@@ -78,6 +76,11 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
             SDL_Rect actor_pos = { .x = actor_loc.x, .y = actor_loc.y  - get_tile_height(camera), .w = actor_loc.w, .h = actor_loc.h };
             SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &actor_pos);
         }
+
+        // DEBUG INFO
+        const char index_str[3] = "00";
+        snprintf(index_str, 3, "%02d", i % 100);
+        draw_font(renderer, data->font, loc.x + get_tile_height(camera), loc.y, index_str);
     }
 
     // Draw cursor
@@ -114,8 +117,7 @@ static void left_mouse_down(Data *data)
 {
     static int x, y;
     SDL_GetMouseState(&x, &y);
-    SDL_Point clicked = iso_from_screen(&data->camera, &data->world,
-                                        data->surface, x, y);
+    SDL_Point clicked = iso_from_screen_point(&data->camera, data->surface, x, y);
     if (clicked.x == -1)
         return;
     int pos = clicked.x + (clicked.y * data->world.width);
@@ -135,15 +137,13 @@ static void left_mouse_down(Data *data)
         return;
     // Overrite the on click function.
     data->world.click_handler = data->world.actors[pos].on_click;
-    // printf("Click stored: %p\n", (void*) data->world.actors[pos].on_click);
 }
 
 static void mouse_hover(Data *data)
 {
     static int x, y;
     SDL_GetMouseState(&x, &y);
-    SDL_Point clicked = iso_from_screen(&data->camera, &data->world,
-                                        data->surface, x, y);
+    SDL_Point clicked = iso_from_screen_point(&data->camera, data->surface, x, y);
     if (clicked.x < 0 || clicked.x >= data->world.width ||
         clicked.y < 0 || clicked.y >= data->world.height)
         return;
@@ -154,7 +154,7 @@ static void mouse_hover(Data *data)
 static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
     Data *data = (Data *)d;
     int hover_index = get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y);
-    int selected_index = get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y);
+    // int selected_index = get_tile_index(data->world.width, data->world.cursor_x, data->world.cursor_y);
     
     switch (event.type)
     {
@@ -172,7 +172,7 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
         // Camera
         case SDL_SCANCODE_A:
             //if (data->camera_x - 1 >= -(data->width * 0.15))
-            data->camera.x--;
+            data->camera.x--
             break;
         case SDL_SCANCODE_D:
             //if (data->camera_x + 1 < (data->width * 0.55))
@@ -188,16 +188,16 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
             break;
         // Cursor
         case SDL_SCANCODE_LEFT:
-            if (data->world.cursor_x + 1 < data->world.width)
-                data->world.cursor_x++;
-            if (data->world.cursor_y - 1 > -1)
-                data->world.cursor_y--;
-            break;
-        case SDL_SCANCODE_RIGHT:
-            if (data->world.cursor_x - 1 > -1)
+            if (data->world.cursor_x - 1 >= 0)
                 data->world.cursor_x--;
             if (data->world.cursor_y + 1 < data->world.height)
                 data->world.cursor_y++;
+            break;
+        case SDL_SCANCODE_RIGHT:
+            if (data->world.cursor_x + 1 < data->world.width)
+                data->world.cursor_x++;
+            if (data->world.cursor_y - 1 >= 0)
+                data->world.cursor_y--;
             break;
         case SDL_SCANCODE_UP:
             if (data->world.cursor_x - 1 > -1)
@@ -227,8 +227,14 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
             break;
         // Change actor type
         case SDL_SCANCODE_R:
-            data->world.actors[hover_index] =
-                create_actor[(data->world.actors[hover_index].type + 1) % NUM_ACTORS]((ActorPosition) { .x = data->world.cursor_x, .y = data->world.cursor_y }, 0);
+            // Clear actor.
+            if ((data->world.actors[hover_index].type + 1) % NUM_ACTORS == NO_ACTOR) {
+                data->world.actors[hover_index] = (Actor) {0};
+            // Create actor.
+            } else {
+                data->world.actors[hover_index] =
+                    create_actor[(data->world.actors[hover_index].type + 1) % NUM_ACTORS]((ActorPosition) { .x = data->world.cursor_x, .y = data->world.cursor_y }, 0);
+            }
             break;
         // Change accent type
         case SDL_SCANCODE_F:

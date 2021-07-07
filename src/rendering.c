@@ -45,7 +45,7 @@ SDL_Rect iso_fto_screen(Camera *camera, float x, float y)
     };
 }
 
-SDL_Point iso_from_screen(Camera *camera, World *world, SDL_Surface *surface,
+SDL_Point iso_from_screen_point(Camera *camera, SDL_Surface *surface,
                           int x, int y)
 {
     // Get generic square position on logical canvas (viewport).
@@ -60,6 +60,7 @@ SDL_Point iso_from_screen(Camera *camera, World *world, SDL_Surface *surface,
     int y_offset = (y % get_tile_height(camera)) / camera->zoom;
     uint32_t pixel = *((uint32_t *)surface->pixels +
                        y_offset * surface->w + x_offset);
+    // Use sprite to determine corners.
     SDL_Color sample = {0};
     SDL_GetRGBA(pixel, surface->format, &sample.r, &sample.g, &sample.b,
                 &sample.a);
@@ -71,10 +72,6 @@ SDL_Point iso_from_screen(Camera *camera, World *world, SDL_Surface *surface,
         real_y++;
     if (!sample.r && !sample.g && sample.b && sample.a)
         real_y--;
-
-    if (real_x < 0 || real_x >= world->width || real_y < 0 ||
-        real_y >= world->height)
-        return (SDL_Point){-1, -1};
     return (SDL_Point){
         .x = real_x,
         .y = real_y,
