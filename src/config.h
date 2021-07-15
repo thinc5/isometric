@@ -13,6 +13,8 @@
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 32
 
+#define DEBUG_FONT_SIZE (WINDOW_WIDTH / 100)
+
 #define UTIL_ROW 0
 #define TILE_ROW 1
 #define ACTOR_ROW 5
@@ -21,6 +23,8 @@
 #define ZOOM_STEP 0.5f
 #define ZOOM_MAX 4.00f
 #define ZOOM_MIN 1.0f
+
+#define ACTOR_MOVE_RATE 500
 
 // QUEUE
 #define JOB_QUEUE_SIZE 10
