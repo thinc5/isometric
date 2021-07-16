@@ -16,40 +16,41 @@
 static void path_find(MoveActorJob *job)
 {
     // Calculate direction.
-    DIRECTION x_dir = EAST;
-    DIRECTION y_dir = NORTH;
+    DIRECTION x_dir = NORTH;
+    DIRECTION y_dir = WEST;
     int x_diff = 0;
     int y_diff = 0;
+    // Which direction on the x axis?
+    if (job->current.y < job->destination.y)
+    {
+        y_dir = SOUTH;
+        y_diff = job->destination.y - job->current.y;
+    }
+    else
+    {
+        y_dir = NORTH;
+        y_diff = job->current.y - job->destination.y;
+    }
     if (job->current.x < job->destination.x)
     {
         x_dir = EAST;
         x_diff = job->destination.x - job->current.x;
     }
-    else if (job->current.x > job->destination.x)
+    else
     {
         x_dir = WEST;
         x_diff = job->current.x - job->destination.x;
-    }
-    if (job->current.y < job->destination.y)
-    {
-        y_dir = NORTH;
-        y_diff = job->destination.y - job->current.y;
-    }
-    else if (job->current.y > job->destination.y)
-    {
-        y_dir = SOUTH;
-        y_diff = job->current.y - job->destination.y;
     }
     if (x_diff < y_diff)
     {
         job->direction = y_dir;
         if (y_dir == NORTH)
         {
-            job->next.y = job->current.y + 1;
+            job->next.y = job->current.y - 1;
         }
         else
         {
-            job->next.y = job->current.y - 1;
+            job->next.y = job->current.y + 1;
         }
     }
     else
@@ -91,35 +92,26 @@ static bool move_frame(Data *data)
     // Change the actor position.
     Actor *actor = job->moving;
     uint32_t diff = (time - job->last_move) % job->move_rate;
-    unsigned int height = get_tile_height(&data->camera);
-    unsigned int width = get_tile_width(&data->camera);
+    // How far through the current tile are we?
     float perc = (float)diff / (float)job->move_rate;
-    float x_offset = 0;
-    float y_offset = 0;
     // Process a movement in a direction.
     switch (job->direction)
     {
     case NORTH:
-        x_offset = -perc * (width / 2);
-        y_offset = perc * (height / 2);
+        actor->position.y = job->current.y - perc;
         break;
     case SOUTH:
-        x_offset = perc * (width / 2);
-        y_offset = -perc * (height / 2);
+        actor->position.y = job->current.y + perc;
         break;
     case EAST:
-        x_offset = perc * (width / 2);
-        y_offset = perc * (height / 2);
+        actor->position.x = job->current.x + perc;
         break;
     case WEST:
-        x_offset = -perc * (width / 2);
-        y_offset = -perc * (height / 2);
+        actor->position.x = job->current.x - perc;
         break;
     default:
         break;
     }
-    actor->position.x = job->current.x + (x_offset / 100);
-    actor->position.y = job->current.y + (y_offset / 100);
 
     // Can this job be processed again or do we need to wait longer?
     if (job->last_move + job->move_rate > time)
@@ -127,23 +119,15 @@ static bool move_frame(Data *data)
 
     // Set the last move time.
     job->last_move = time;
-    // Set the next move target.
-    SDL_Point previous = job->current;
     job->current = job->next;
     // Update the actor position.
     actor->position = (ActorPosition) { .x = job->current.x, .y = job->current.y };
     // Get the next move target.
     path_find(job);
-    // Update the actual actor position on the cartesian plane
-    // Write new location of the actor.
-    world->actors[get_tile_index(world->width, job->next.x, job->next.y)] = *job->moving;
-    // Clear old location.
-    *job->moving = (Actor) {0};
-    // Get reference to new location.
-    job->moving = &world->actors[get_tile_index(world->width, job->next.x, job->next.y)];
     return false;
 }
 
+// Move actor visually, does not move the actor's position in the grid.
 bool move_actor_job(void *ptr, SDL_Point from, SDL_Point to)
 {
     Data *data = ptr;
@@ -164,7 +148,7 @@ bool move_actor_job(void *ptr, SDL_Point from, SDL_Point to)
     job_data->current = from;
     job_data->next = job_data->current;
     path_find(job_data);
-    job_data->move_rate = 1000;
+    job_data->move_rate = ACTOR_MOVE_RATE;
     job_data->last_move = get_time(&data->timer);
     // Create the job and push to the queue.
     Job move_job = {0};
