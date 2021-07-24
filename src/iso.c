@@ -47,7 +47,7 @@ static void handle_events(Data *data)
                 break;
             if (element->capabilities & UI_EVENT_HANDLING)
                 if (element->handle_event((bool *)data, event, element))
-                    return;
+                    continue;
         }
         // Rest of the events.
         switch (event.type)

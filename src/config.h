@@ -20,7 +20,7 @@
 #define ACTOR_ROW 5
 
 // GAMEPLAY CONSTANTS
-#define ZOOM_STEP 0.5f
+#define ZOOM_STEP 0.02f
 #define ZOOM_MAX 4.00f
 #define ZOOM_MIN 1.0f
 

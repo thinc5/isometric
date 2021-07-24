@@ -25,13 +25,13 @@ void init_data(Data *data)
     data->current_job.process = NULL;
     data->current_job.render = NULL;
     // Initialize the world.
-    init_world(&data->world, 25, 25);
+    init_world(&data->world, 5, 5);
     // Initialize the camera.
     data->camera.x_offset = 0;
     data->camera.y_offset = 0;
-    data->camera.x = -(data->world.width * 0.3);
-    data->camera.y = (data->world.height * 0.4);
     data->camera.zoom = 1.0f;
+    data->camera.x = -(data->world.width);// (get_tile_width(&data->camera) / WINDOW_WIDTH) / 2;
+    data->camera.y = 0;// (get_tile_height(&data->camera) / WINDOW_HEIGHT) / 2;
     // Initialize the game timer.
     uint32_t now = SDL_GetTicks();
     data->timer.start_time = now;
@@ -66,7 +66,7 @@ void init_world(World *world, uint16_t width, uint16_t height)
     world->accents = (Accent *)malloc(sizeof(Accent) * area);
     world->actors = (Actor *)malloc(sizeof(Actor) * area);
     for (uint32_t pos = 0; pos < area; pos++)
-        world->board[pos] = SAND_TILE;
+        world->board[pos] = GRASS_TILE;
     memset(world->accents, NO_ACCENT, area * sizeof(Accent));
     memset(world->actors, NO_ACTOR, area * sizeof(Actor));
     world->width = width;

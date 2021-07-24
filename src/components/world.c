@@ -73,7 +73,7 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         SDL_Rect transf = iso_to_screen(camera, world->cursor_x, world->cursor_y);
         transf.h = get_tile_height(camera);
         SDL_Rect crsr_sub = {
-            .x = ((time % 2000) / 1000) * TILE_WIDTH,
+            .x = (((time % 2000) / 1000) + 2) * TILE_WIDTH,
             .y = TILE_HEIGHT * (UTIL_ROW + 1),
             .w = TILE_WIDTH,
             .h = TILE_HEIGHT,
