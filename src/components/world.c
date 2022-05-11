@@ -52,7 +52,6 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
 
         // Get the possible things to render.
         TILE_TYPE tile = world->board[i];
-        Accent *accent = &world->accents[i];
         if (tile != NO_TILE && tiles[tile].animation != NO_ANIMATION) {
             Animation *animation = &data->animations[tiles[tile].animation];
             int step = animation->frames == 1
@@ -60,7 +59,8 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
                 : (time % (animation->step * animation->frames)) / animation->step;
             SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &loc);
         }
-        if (accent->type != NO_ACCENT && accent->animation != NO_ANIMATION) {
+        Accent *accent = &world->accents[i];
+        if (accent->type != NO_ACCENT || accent->animation != NO_ANIMATION) {
             SDL_Rect accent_loc = { .x = loc.x, .y = loc.y - get_tile_height(camera), .w = loc.w, .h = loc.h };
             Animation *animation = &data->animations[accent->animation];
             int step = (time % (animation->step * animation->frames)) / animation->step;
@@ -105,7 +105,7 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
                 loc.y > WINDOW_HEIGHT)
             continue;
         Actor *actor = &world->actors[i];
-        if (actor->type != NO_ACTOR && actor->animation != NO_ANIMATION) {
+        if (actor->type != NO_ACTOR || actor->animation != NO_ANIMATION) {
             Animation *animation = &data->animations[actor->animation];
             int step = (time % (animation->step * animation->frames)) / animation->step;
             SDL_Rect actor_loc = iso_fto_screen(camera, actor->position.x, actor->position.y);
@@ -255,20 +255,23 @@ static bool handle_world_event(void *d, SDL_Event event, UI_Element *element) {
                 (data->world.board[hover_index] + 1) % NUM_TILES;
             break;
         // Change actor type
-        case SDL_SCANCODE_R:
-            // Clear actor.
-            if ((data->world.actors[hover_index].type + 1) % NUM_ACTORS == NO_ACTOR) {
-                data->world.actors[hover_index] = (Actor) {0};
-            // Create actor.
-            } else {
-                data->world.actors[hover_index] =
-                    create_actor[(data->world.actors[hover_index].type + 1) % NUM_ACTORS]((ActorPosition) { .x = data->world.cursor_x, .y = data->world.cursor_y }, 0);
-            }
+        case SDL_SCANCODE_R: {
+            int next_actor = (data->world.actors[hover_index].type + 1) % NUM_ACTORS;
+            data->world.actors[hover_index] = next_actor == NO_ACTOR ?
+                (Actor) {0} :
+                create_actor[next_actor](
+                    (ActorPosition) { .x = data->world.cursor_x, .y = data->world.cursor_y },
+                    0
+                );
+            };
             break;
         // Change accent type
-        case SDL_SCANCODE_F:
-            data->world.accents[hover_index] =
-                create_accent[(data->world.accents[hover_index].type + 1) % NUM_ACCENTS]();
+        case SDL_SCANCODE_F: {
+            int next_accent = (data->world.accents[hover_index].type + 1) % NUM_ACCENTS;
+            data->world.accents[hover_index] = next_accent == NO_ACCENT ?
+                (Accent) {0} : 
+                create_accent[next_accent]();
+            };
             break;
         case SDL_SCANCODE_F1:
         case SDL_SCANCODE_K:
