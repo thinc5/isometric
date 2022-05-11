@@ -11,6 +11,7 @@ typedef enum ACCENT_TYPE
 {
     NO_ACCENT,
     SHRUB,
+    CASTLE,
     NUM_ACCENTS,
 } ACCENT_TYPE;
 
@@ -21,5 +22,8 @@ typedef struct Accent
 } Accent;
 
 extern Accent (*create_accent[NUM_ACCENTS])(void);
+
+Accent create_shrub(void);
+Accent create_castle(void);
 
 #endif

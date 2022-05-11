@@ -1,9 +1,9 @@
 #include "accent.h"
 
-Accent create_shrub(void)
+Accent create_castle(void)
 {
     return (Accent) {
-        .type = SHRUB,
+        .type = CASTLE,
         .animation = ANIM_SHRUB
     };
 }

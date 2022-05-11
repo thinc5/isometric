@@ -3,7 +3,6 @@
 #include "../jobs/move_actor.h"
 
 #include "actor.h"
-#include "minion.h"
 
 Actor create_minion(ActorPosition position, int args)
 {
