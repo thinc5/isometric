@@ -21,6 +21,10 @@ static void draw_info_row(SDL_Renderer *renderer, TTF_Font *font, char* display_
     memset(display_string, '0', LINE_WIDTH);
 }
 
+static void write_camera_info(char *display_string, Camera *camera) {
+    snprintf(display_string, 35, "Camera info: x: %03d, y: %03d z: %03.3f", camera->x % 1000, camera->y % 1000, camera->zoom);
+}
+
 static void write_current_time(char *display_string, float time) {
     snprintf(display_string, 22, "Time Elapsed: %7.3f", time);
 }
@@ -54,6 +58,18 @@ static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
     SDL_RenderFillRect(renderer, &logical);
     size_t draw_row = 0;
     char line_buffer[LINE_WIDTH] = { 0 };
+
+    // Camera info
+    write_camera_info(line_buffer, &data->camera);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Game time elapsed
+    write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Game time elapsed
+    write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
 
     // Game time elapsed
     write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);

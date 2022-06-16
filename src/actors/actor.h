@@ -32,4 +32,6 @@ extern Actor (*create_actor[NUM_ACTORS])(ActorPosition, int, ...);
 
 bool move_actor(void *ptr, SDL_Point from, SDL_Point to);
 
+Actor create_minion(ActorPosition position, int args);
+
 #endif

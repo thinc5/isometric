@@ -47,7 +47,7 @@ static void handle_events(Data *data)
                 break;
             if (element->capabilities & UI_EVENT_HANDLING)
                 if (element->handle_event((bool *)data, event, element))
-                    return;
+                    continue;
         }
         // Rest of the events.
         switch (event.type)
@@ -56,11 +56,9 @@ static void handle_events(Data *data)
             switch (event.key.keysym.scancode)
             {
             case SDL_SCANCODE_F10:
-                if (data->fullscreen) {
-                    SDL_SetWindowFullscreen(data->window, 0);
-                } else {
+                data->fullscreen ?
+                    SDL_SetWindowFullscreen(data->window, 0) :
                     SDL_SetWindowFullscreen(data->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                }
                 data->fullscreen = !data->fullscreen;
                 break;
             default:
