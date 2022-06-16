@@ -26,17 +26,17 @@
 #include "./accents/accent.h"
 #include "./actors/actor.h"
 
-// EVENT HANDLING
+// ROOT EVENT HANDLING
 static void handle_events(Data *data)
 {
     static SDL_Event event;
-    static bool muted;
     while (SDL_PollEvent(&event))
     {
         // Check top level input first
         if (event.type == SDL_QUIT)
         {
             data->status = CLOSING;
+            printf("Closing....\n");
             return;
         }
         // Check ui elements next
@@ -47,43 +47,23 @@ static void handle_events(Data *data)
                 break;
             if (element->capabilities & UI_EVENT_HANDLING)
                 if (element->handle_event((bool *)data, event, element))
-                    return;
+                    continue;
         }
         // Rest of the events.
         switch (event.type)
         {
         case SDL_KEYDOWN:
-            if (event.key.keysym.scancode == SDL_SCANCODE_M)
+            switch (event.key.keysym.scancode)
             {
-                if (muted)
-                {
-                    Mix_VolumeMusic(VOLUME_DEFAULT);
-                    Mix_Volume(-1, VOLUME_DEFAULT * 1.5);
-                }
-                else
-                {
-                    Mix_VolumeMusic(0);
-                    Mix_Volume(-1, 0);
-                }
-                muted = !muted;
-            }
-            if (data->status == PAUSED)
-            {
-                switch (event.key.keysym.scancode)
-                {
-                case SDL_SCANCODE_P:
-                case SDL_SCANCODE_ESCAPE:
-                    unpause_game(&data->timer);
-                    break;
-                default:
-                    break;
-                }
+            case SDL_SCANCODE_F10:
+                data->fullscreen ?
+                    SDL_SetWindowFullscreen(data->window, 0) :
+                    SDL_SetWindowFullscreen(data->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                data->fullscreen = !data->fullscreen;
+                break;
+            default:
                 break;
             }
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            break;
-        case SDL_MOUSEMOTION:
             break;
         default:
             break;
@@ -105,13 +85,13 @@ static void init_rendering(Data *data)
     SDL_SetRenderDrawBlendMode(data->renderer, SDL_BLENDMODE_BLEND);
     data->font =
         TTF_OpenFontRW(SDL_RWFromConstMem(__res_ssp_regular_otf, __res_ssp_regular_otf_len),
-                       1, WINDOW_WIDTH / 80);
+                       1, DEBUG_FONT_SIZE);
     data->surface =
         IMG_Load_RW(
             SDL_RWFromConstMem(__res_iso_demo_png, __res_iso_demo_png_len),
             1);
     data->tiles = SDL_CreateTextureFromSurface(data->renderer, data->surface);
-    SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(data->renderer, DEFAULT_BACKGROUND_COLOUR);
 }
 
 static void free_rendering(Data *data)

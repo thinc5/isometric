@@ -10,8 +10,8 @@
 
 // Binary flags to indicate features that have been enabled.
 typedef uint8_t UI_CAPABILITIES;
-#define UI_RENDERING 1
-#define UI_EVENT_HANDLING 2
+#define UI_RENDERING 0x01
+#define UI_EVENT_HANDLING 0x02
 
 typedef struct ButtonState
 {

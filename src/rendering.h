@@ -19,6 +19,6 @@ SDL_Point iso_from_screen_point(Camera *camera, SDL_Surface *surface,
                           int x, int y);
 
 void draw_font(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
-                      const char *str);
+                      const char *str, SDL_Color c);
 
 #endif

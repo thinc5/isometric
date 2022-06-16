@@ -1,5 +1,4 @@
 #include "actor.h"
-#include "minion.h"
 
 /**
  * Initialization array for Actors.

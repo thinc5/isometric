@@ -17,8 +17,12 @@
 
 static void draw_info_row(SDL_Renderer *renderer, TTF_Font *font, char* display_string, size_t render_row)
 {
-    draw_font(renderer, font, 0, render_row * ROW_HEIGHT, display_string);
+    draw_font(renderer, font, 0, render_row * ROW_HEIGHT, display_string, SDL_COLOUR(DEBUG_FONT_COLOUR));
     memset(display_string, '0', LINE_WIDTH);
+}
+
+static void write_camera_info(char *display_string, Camera *camera) {
+    snprintf(display_string, 35, "Camera info: x: %03d, y: %03d z: %03.3f", camera->x % 1000, camera->y % 1000, camera->zoom);
 }
 
 static void write_current_time(char *display_string, float time) {
@@ -55,6 +59,18 @@ static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
     size_t draw_row = 0;
     char line_buffer[LINE_WIDTH] = { 0 };
 
+    // Camera info
+    write_camera_info(line_buffer, &data->camera);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Game time elapsed
+    write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
+    // Game time elapsed
+    write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
+    draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
+
     // Game time elapsed
     write_current_time(line_buffer, (float) get_time(&data->timer) / 1000.0);
     draw_info_row(data->renderer, data->font, line_buffer, draw_row++);
@@ -90,10 +106,10 @@ static void render_inspector(SDL_Renderer *renderer, UI_Element *element)
     } else {
         snprintf(on_click_addr + 10, 7, "%p", (void*) &data->world.click_handler);
     }
-    draw_font(data->renderer, data->font, 0, draw_row++ * ROW_HEIGHT, on_click_addr);
+    draw_font(data->renderer, data->font, 0, draw_row++ * ROW_HEIGHT, on_click_addr, SDL_COLOUR(DEBUG_FONT_COLOUR));
 
     // Reset the render draw colour.
-    SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(data->renderer, DEFAULT_BACKGROUND_COLOUR);
 }
 
 UI_Element create_inspector(SDL_Point position, int argc, Data* data, unsigned int width,

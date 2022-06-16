@@ -7,3 +7,6 @@ obj
 # Generated at build time, no point committing 
 font.h
 tiles.h
+
+# Dont need to store local testing saves...
+save*.txt

@@ -53,6 +53,7 @@ typedef struct Data
 {
     GAME_STATUS status;
     bool debug;
+    bool fullscreen;
     // Renderer
     SDL_Window *window;
     SDL_Renderer *renderer;
