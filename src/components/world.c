@@ -45,27 +45,28 @@ static void render_world(SDL_Renderer *renderer, UI_Element *element)
         int x = i % world->width;
         int y = i / world->width;
         SDL_Rect loc = iso_to_screen(camera, x, y);
-        // Cull
+        // Cull coords outside of view.
         if (loc.x + loc.w < 0 || loc.x > WINDOW_WIDTH || loc.y + loc.h < 0 ||
                 loc.y > WINDOW_HEIGHT)
             continue;
 
         // Get the possible things to render.
-        TILE_TYPE tile = world->board[i];
-        if (tile != NO_TILE && tiles[tile].animation != NO_ANIMATION) {
-            Animation *animation = &data->animations[tiles[tile].animation];
+        TILE_TYPE tile_type = world->board[i];
+        Tile *tile = &tiles[tile_type];
+        if (tile->type != NO_TILE && tile->animation != NO_ANIMATION) {
+            Animation *animation = &data->animations[tile->animation];
             int step = animation->frames == 1
                 ? 0
                 : (time % (animation->step * animation->frames)) / animation->step;
             SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &loc);
         }
-        Accent *accent = &world->accents[i];
-        if (accent->type != NO_ACCENT || accent->animation != NO_ANIMATION) {
-            SDL_Rect accent_loc = { .x = loc.x, .y = loc.y - get_tile_height(camera), .w = loc.w, .h = loc.h };
-            Animation *animation = &data->animations[accent->animation];
-            int step = (time % (animation->step * animation->frames)) / animation->step;
-            SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &accent_loc);
-        }
+        // Accent *accent = &world->accents[i];
+        // if (accent->type != NO_ACCENT || accent->animation != NO_ANIMATION) {
+        //     SDL_Rect accent_loc = { .x = loc.x, .y = loc.y - get_tile_height(camera), .w = loc.w, .h = loc.h };
+        //     Animation *animation = &data->animations[accent->animation];
+        //     int step = (time % (animation->step * animation->frames)) / animation->step;
+        //     SDL_RenderCopy(renderer, data->tiles, &animation->textures[step], &accent_loc);
+        // }
     }
 
     // Draw cursor.

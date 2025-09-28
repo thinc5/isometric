@@ -35,6 +35,13 @@ typedef struct InspectorState
     void *data;
 } InspectorState;
 
+typedef struct CubedState
+{
+    unsigned int h;
+    unsigned int w;
+    void *data;
+} CubedState;
+
 // Registered UI element types.
 typedef enum UI_ELEMENT_TYPE
 {

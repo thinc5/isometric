@@ -53,7 +53,6 @@ void init_data(Data *data)
 
 void free_data(Data *data)
 {
-    free_animations(data->animations);
     free(data->job_queue.store);
 }
 

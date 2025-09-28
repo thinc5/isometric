@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 
 #define MAX_STEPS 20
+#define MAX_FRAMES 20
 
 typedef enum ANIMATION_NAME
 {
@@ -23,11 +24,9 @@ typedef struct Animation
 {
     uint8_t frames;
     uint32_t step;
-    SDL_Rect *textures;
+    SDL_Rect textures[MAX_FRAMES];
 } Animation;
 
 void init_animations(Animation animations[NUM_ANIMATIONS]);
-
-void free_animations(Animation animations[NUM_ANIMATIONS]);
 
 #endif

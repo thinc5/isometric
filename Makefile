@@ -1,10 +1,13 @@
+FORMATTER		:= uncrustify
+FORMAT_CONFIG	:= clean.cfg
+
 #-------------- Variables
 # executable name
 TARGET	:= iso
 # compiler to use
 CC		:= gcc
 # compiler flags
-CFLAGS  := -std=gnu11 -O3 -Wall -pedantic -MD
+CFLAGS  := -std=gnu11 -Wall -pedantic -MD
 # linker to use
 LINKER  := gcc
 # linking flags
@@ -28,6 +31,8 @@ SOURCES  	:= $(shell $(findc))
 INCLUDES 	:= $(shell $(findh))
 RESOURCES	:= ./$(SRCDIR)/tiles.h ./$(SRCDIR)/font.h
 
+FORMAT_TARGETS	:= $(SOURCES) $(INCLUDES)
+
 # what are my objects?
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
@@ -44,6 +49,9 @@ all: build
 debug: CFLAGS += -DDEBUG -g
 debug: LFLAGS += -DDEBUG -g
 debug: build
+
+release: CFLAGS += -DRELEASE -O3
+release: build
 
 # prepare respources
 $(RESOURCES) : ./res/iso_demo.png ./res/ssp-regular.otf
@@ -68,8 +76,16 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 	@$(LINKER) $(OBJECTS) $(LFLAGS) -o $@
 	$(info Binary: $@)
 
+$(FORMAT_TARGETS):
+	@$(FORMATTER) -c $(FORMAT_CONFIG) -q -f $@ -o $@
 
-.PHONY:	clean
+format_clean:
+	@$(RM) **.unc*
+	@$(RM) **/**.unc*
+
+format: $(FORMAT_TARGETS) format_clean
+
+.PHONY:	clean format
 
 # clean all building materials.
 clean:
